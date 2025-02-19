@@ -8,13 +8,13 @@ const Footer: React.FC = () => {
 
   return (
     <View style={styles.footer}>
-      <TouchableOpacity onPress={() => router.push('/')}>
+      <TouchableOpacity onPress={() => router.push('/historique')}>
         <FontAwesome name="home" size={24} color="white" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push('/')}>
         <FontAwesome name="search" size={24} color="white" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/connexion')}>
+      <TouchableOpacity onPress={() => router.push('/connexion')}>  {/* Go vers /connexion si pas de token sinon go vers /historique */}
         <FontAwesome name="arrow-right" size={24} color="white" />
       </TouchableOpacity>
     </View>

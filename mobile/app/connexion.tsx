@@ -19,7 +19,7 @@ const Connexion: React.FC = () => {
     }
 
     setLoading(true);
-    setAlertMessage('');  // Réinitialiser le message d'alerte avant chaque tentative
+    setAlertMessage('');  
 
     try {
       const response = await axios.post('http://localhost:5000/check_credentials', {
@@ -29,6 +29,8 @@ const Connexion: React.FC = () => {
 
       if (response.status === 200) {
         setAlertMessage('Connexion réussie !');
+        //Rajoute la partie pour l'API
+        //Rajouter la partie de changement vers historique.tsx
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -53,7 +55,7 @@ const Connexion: React.FC = () => {
     }
 
     setLoading(true);
-    setAlertMessage('');  // Réinitialiser le message d'alerte avant chaque tentative
+    setAlertMessage('');  
 
     try {
       const response = await axios.post('http://localhost:5000/add_user', {
