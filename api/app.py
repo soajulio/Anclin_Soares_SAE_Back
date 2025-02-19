@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import psycopg2
 import os
 import sys
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -23,11 +24,10 @@ def get_db_connection():
 def hello():
     return "Backend Flask opérationnel !"
 
-#Route pour vérifier que l'user est bon
 @app.route('/check_credentials', methods=['POST'])
 def check_credentials():
     data = request.get_json()
-    
+
     if not data or 'username' not in data or 'password' not in data:
         return jsonify({"error": "Les champs 'username' et 'password' sont requis."}), 400
 
@@ -37,28 +37,27 @@ def check_credentials():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    cur.execute('SELECT * FROM users WHERE username = %s AND password = %s;', (username, password))
+    cur.execute('SELECT password FROM users WHERE username = %s;', (username,))
     user = cur.fetchone()
 
     cur.close()
     conn.close()
 
-    if user:
+    if user and check_password_hash(user[0], password):
         return jsonify({'message': 'Connexion réussie'}), 200
     else:
         return jsonify({'error': 'Nom d\'utilisateur ou mot de passe incorrect'}), 401
 
-# Route pour ajouter un nouvel utilisateur
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    data = request.get_json()  
-    
+    data = request.get_json()
+
     if not data or 'username' not in data or 'email' not in data or 'password' not in data:
         return jsonify({"error": "Les champs 'username', 'email' et 'password' sont requis."}), 400
 
     username = data['username']
     email = data['email']
-    password = data['password']
+    password = generate_password_hash(data['password'])
 
     conn = get_db_connection()
     cur = conn.cursor()
@@ -67,7 +66,7 @@ def add_user():
         cur.execute('INSERT INTO users (username, email, password) VALUES (%s, %s, %s);',
                     (username, email, password))
         conn.commit()
-        
+
         cur.close()
         conn.close()
 
