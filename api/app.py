@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import psycopg2
 import os
 import sys
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import make_response
 
 app = Flask(__name__)
+
+cors = CORS(app)
 
 def get_db_connection():
     try:
@@ -44,9 +48,12 @@ def check_credentials():
     conn.close()
 
     if user and check_password_hash(user[0], password):
-        return jsonify({'message': 'Connexion réussie'}), 200
+        # Créer la réponse avec CORS
+        response = make_response(jsonify({'message': 'Connexion réussie'}), 200)
+        return response
     else:
-        return jsonify({'error': 'Nom d\'utilisateur ou mot de passe incorrect'}), 401
+        response = make_response(jsonify({'error': 'Nom d\'utilisateur ou mot de passe incorrect'}), 401)
+        return response
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -70,13 +77,16 @@ def add_user():
         cur.close()
         conn.close()
 
-        return jsonify({"message": "Utilisateur ajouté avec succès"}), 201
+        # Réponse après ajout de l'utilisateur avec CORS
+        response = make_response(jsonify({"message": "Utilisateur ajouté avec succès"}), 201)
+        return response
 
     except psycopg2.Error as e:
         conn.rollback()
         cur.close()
         conn.close()
-        return jsonify({"error": f"Erreur lors de l'ajout de l'utilisateur: {e}"}), 500
+        response = make_response(jsonify({"error": f"Erreur lors de l'ajout de l'utilisateur: {e}"}), 500)
+        return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

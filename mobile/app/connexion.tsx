@@ -6,9 +6,12 @@ import Footer from '../component/footer';
 const Connexion: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSignup, setIsSignup] = useState(false); 
 
+  // Gestion de la connexion
   const handleLogin = async () => {
     if (username === '' || password === '') {
       setAlertMessage('Veuillez remplir tous les champs.');
@@ -16,10 +19,10 @@ const Connexion: React.FC = () => {
     }
 
     setLoading(true);
-    setAlertMessage('');
+    setAlertMessage('');  // Réinitialiser le message d'alerte avant chaque tentative
 
     try {
-      const response = await axios.post('http://192.168.x.x:5000/check_credentials', { // Remplace par l'IP de ton PC
+      const response = await axios.post('http://localhost:5000/check_credentials', {
         username: username,
         password: password,
       });
@@ -42,9 +45,41 @@ const Connexion: React.FC = () => {
     }
   };
 
+  // Gestion de l'inscription
+  const handleSignup = async () => {
+    if (username === '' || password === '' || email === '') {
+      setAlertMessage('Veuillez remplir tous les champs.');
+      return;
+    }
+
+    setLoading(true);
+    setAlertMessage('');  // Réinitialiser le message d'alerte avant chaque tentative
+
+    try {
+      const response = await axios.post('http://localhost:5000/add_user', {
+        username: username,
+        password: password,
+        email: email,
+      });
+    
+      if (response.status === 201) {
+        setAlertMessage('Utilisateur créé avec succès !');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response ? error.response.data.error : error.message;
+        setAlertMessage(`Erreur lors de l'inscription : ${errorMessage}`);
+      } else {
+        setAlertMessage('Erreur inattendue. Veuillez réessayer.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Connexion</Text>
+      <Text style={styles.title}>{isSignup ? 'Créer un compte' : 'Connexion'}</Text>
       <View style={styles.form}>
         <TextInput
           style={styles.input}
@@ -63,10 +98,26 @@ const Connexion: React.FC = () => {
           accessible
           accessibilityLabel="Mot de passe"
         />
-        <Button title="Se connecter" onPress={handleLogin} disabled={loading} />
+        {isSignup && (
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            accessible
+            accessibilityLabel="Email"
+          />
+        )}
+        <Button title={isSignup ? "S'inscrire" : "Se connecter"} onPress={isSignup ? handleSignup : handleLogin} disabled={loading} />
         {loading && <ActivityIndicator size="large" color="#0000ff" />}
       </View>
       {alertMessage ? <Text style={styles.alertText}>{alertMessage}</Text> : null}
+
+      <Button
+        title={isSignup ? 'Déjà un compte ? Connexion' : 'Pas de compte ? Créer un compte'}
+        onPress={() => setIsSignup(!isSignup)}
+      />
+
       <Footer />
     </View>
   );

@@ -1,8 +1,15 @@
 version: "3.8"
 
+networks:
+  app:
+    name: app
+
 services:
-  api:
-    build: ./api
+  api: 
+    image: python:3.9-slim
+    networks:
+        - app
+
     ports:
       - "5000:5000"
     environment:
@@ -10,10 +17,13 @@ services:
     depends_on:
       - db
     volumes:
-      - ./db:/db  # Monte le dossier db pour accéder à init.py
-    command: ["sh", "-c", "python db/init.py && python app.py"]
+      - ./api:/api
+    command: ["sh", "-c", "pip install -r /api/requirements.txt && python /api/app.py"]
 
   mobile:
+    networks:
+      - app
+
     build: ./mobile
     volumes:
       - ./mobile:/app
@@ -21,6 +31,9 @@ services:
       - "8081:8081"
 
   db:
+    networks:
+      - app
+
     container_name: database
     image: postgres:17
     environment:

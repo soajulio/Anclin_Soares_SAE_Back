@@ -1,3 +1,4 @@
 Flask==2.3.2
-psycopg2-binary==2.9.5  # Pour la connexion à PostgreSQL
-gunicorn==20.1.0        # Serveur WSGI pour déployer Flask
+Flask-Cors==5.0.0
+psycopg2-binary==2.9.5
+gunicorn==20.1.0
