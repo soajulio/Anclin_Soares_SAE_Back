@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   api:
@@ -9,6 +9,9 @@ services:
       - FLASK_ENV=${FLASK_ENV}
     depends_on:
       - db
+    volumes:
+      - ./db:/db  # Monte le dossier db pour accéder à init.py
+    command: ["sh", "-c", "python db/init.py && python app.py"]
 
   mobile:
     build: ./mobile
@@ -18,6 +21,7 @@ services:
       - "8081:8081"
 
   db:
+    container_name: database
     image: postgres:17
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
