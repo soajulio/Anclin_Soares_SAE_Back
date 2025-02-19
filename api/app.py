@@ -48,7 +48,6 @@ def check_credentials():
     conn.close()
 
     if user and check_password_hash(user[0], password):
-        # Créer la réponse avec CORS
         response = make_response(jsonify({'message': 'Connexion réussie'}), 200)
         return response
     else:
@@ -70,6 +69,12 @@ def add_user():
     cur = conn.cursor()
 
     try:
+        cur.execute('SELECT 1 FROM users WHERE username = %s OR email = %s;', (username, email))
+        if cur.fetchone():
+            cur.close()
+            conn.close()
+            return make_response(jsonify({"error": "Le nom d'utilisateur ou l'email existe déjà."}), 409)
+
         cur.execute('INSERT INTO users (username, email, password) VALUES (%s, %s, %s);',
                     (username, email, password))
         conn.commit()
@@ -77,7 +82,6 @@ def add_user():
         cur.close()
         conn.close()
 
-        # Réponse après ajout de l'utilisateur avec CORS
         response = make_response(jsonify({"message": "Utilisateur ajouté avec succès"}), 201)
         return response
 
