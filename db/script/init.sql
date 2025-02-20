@@ -7,4 +7,17 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR NOT NULL
 );
 
-INSERT INTO users (username, password, email) VALUES ('admin', 'scrypt:32768:8:1$6xL58chXNfRQZm7B$3ae7d35760aa403b98d6d17a9182e8c0bcce8dc841ebba023eb1d1ff8084e758b77e9c101f366ba95cbd95feeb05587d047630c339143ecb519e7bff52f59da6', 'admin@example.com');
+INSERT INTO users (username, password, email) VALUES ('admin', 'scrypt:32768:8:1$6xL58chXNfRQZm7B$3ae7d35760aa403b98d6d17a9182e8c0bcce8dc841ebba023eb1d1ff8084e758b77e9c101f366ba95cbd95feeb05587d047630c339143ecb519e7bff52f59da6', 'admin@example.com'); 
+
+DROP TABLE IF EXISTS historique;
+
+CREATE TABLE historique (
+    id SERIAL PRIMARY KEY,
+    plante_nom TEXT,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    prediction_score REAL,
+    image BYTEA,
+    url TEXT,
+    timestamp TIMESTAMP
+);
