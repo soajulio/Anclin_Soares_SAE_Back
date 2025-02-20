@@ -20,16 +20,6 @@ services:
       - ./api:/api
     command: ["sh", "-c", "pip install -r /api/requirements.txt && python /api/app.py"]
 
-  mobile:
-    networks:
-      - app
-
-    build: ./mobile
-    volumes:
-      - ./mobile:/app
-    ports:
-      - "8081:8081"
-
   db:
     networks:
       - app
