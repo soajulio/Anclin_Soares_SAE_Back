@@ -3,12 +3,16 @@ from flask_cors import CORS
 import psycopg2
 import os
 import sys
+import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import make_response
 
 app = Flask(__name__)
-
 cors = CORS(app)
+
+API_KEY = os.getenv('PLANT_ID_API_KEY') 
+API_URL = "https://api.plant.id/v2/identify"
+
 
 def get_db_connection():
     try:
@@ -27,6 +31,7 @@ def get_db_connection():
 @app.route('/')
 def hello():
     return "Backend Flask opérationnel !"
+
 
 @app.route('/check_credentials', methods=['POST'])
 def check_credentials():
