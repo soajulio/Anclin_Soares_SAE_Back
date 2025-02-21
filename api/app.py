@@ -1,3 +1,4 @@
+import base64
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import psycopg2
@@ -96,6 +97,85 @@ def add_user():
         conn.close()
         response = make_response(jsonify({"error": f"Erreur lors de l'ajout de l'utilisateur: {e}"}), 500)
         return response
+    
+@app.route('/add_historique', methods=['POST'])
+def add_historique():
+    data = request.get_json()
+
+    # Vérification des champs requis
+    if not data or 'plante_nom' not in data or 'latitude' not in data or 'longitude' not in data or 'prediction_score' not in data or 'image' not in data:
+        return jsonify({"error": "Tous les champs sont requis : plante_nom, latitude, longitude, prediction_score, image"}), 400
+
+    plante_nom = data['plante_nom']
+    latitude = data['latitude']
+    longitude = data['longitude']
+    prediction_score = data['prediction_score']
+    url = data.get('url', None)  # URL facultative
+
+    # Conversion de l'image base64 en binaire
+    image_base64 = data['image']
+    try:
+        image_data = base64.b64decode(image_base64)
+    except Exception as e:
+        return jsonify({"error": "Image en base64 invalide"}), 400
+
+    # Connexion à la base de données
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute("""
+            INSERT INTO historique (plante_nom, latitude, longitude, prediction_score, image, url, timestamp) 
+            VALUES (%s, %s, %s, %s, %s, %s, NOW());
+        """, (plante_nom, latitude, longitude, prediction_score, psycopg2.Binary(image_data), url))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify({"message": "Donnée ajoutée à l'historique avec succès"}), 201
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        return jsonify({"error": f"Erreur lors de l'ajout à l'historique : {e}"}), 500
+
+
+@app.route('/get_historique', methods=['GET'])
+def get_historique():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute("""
+            SELECT id, plante_nom, latitude, longitude, prediction_score, encode(image, 'base64') AS image, url, timestamp 
+            FROM historique
+            ORDER BY timestamp DESC;
+        """)
+        rows = cur.fetchall()
+
+        historique = []
+        for row in rows:
+            historique.append({
+                "id": row[0],
+                "plante_nom": row[1],
+                "latitude": row[2],
+                "longitude": row[3],
+                "prediction_score": row[4],
+                "image": row[5],  # Image en base64
+                "url": row[6],
+                "timestamp": row[7]
+            })
+
+        cur.close()
+        conn.close()
+
+        return jsonify(historique), 200
+    except Exception as e:
+        cur.close()
+        conn.close()
+        return jsonify({"error": f"Erreur lors de la récupération de l'historique : {e}"}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
