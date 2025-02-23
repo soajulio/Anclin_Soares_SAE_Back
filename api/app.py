@@ -18,12 +18,13 @@ API_URL = "https://api.plant.id/v2/identify"
 def get_db_connection():
     try:
         conn = psycopg2.connect(
-            dbname=os.getenv("POSTGRES_DB", "SAE6"),
+            dbname=os.getenv("POSTGRES_DB", "mydatabase"),
             user=os.getenv("POSTGRES_USER", "user"),
             password=os.getenv("POSTGRES_PASSWORD", "password"),
             host=os.getenv("POSTGRES_HOST", "db"),
             port=5432
         )
+        print("Connexion à la base de données réussie")
         return conn
     except psycopg2.Error as e:
         print(f"Erreur lors de la connexion à la base de données: {e}")
