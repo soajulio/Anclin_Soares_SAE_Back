@@ -22,20 +22,3 @@ CREATE TABLE historique (
     timestamp TIMESTAMP
 );
 
-INSERT INTO historique (plante_nom, latitude, longitude, prediction_score, image, url, timestamp)
-VALUES 
-('Rose', 48.8566, 2.3522, 0.95, 
-    pg_read_binary_file('/chemin/vers/ton/image1.jpg'), 
-    'https://example.com/rose', 
-    NOW()
-),
-('Tulipe', 52.3667, 4.8945, 0.90, 
-    pg_read_binary_file('/chemin/vers/ton/image2.jpg'), 
-    'https://example.com/tulipe', 
-    NOW()
-),
-('Orchidée', 34.0522, -118.2437, 0.85, 
-    pg_read_binary_file('/chemin/vers/ton/image3.jpg'), 
-    'https://example.com/orchidee', 
-    NOW()
-);
