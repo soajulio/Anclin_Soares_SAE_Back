@@ -11,20 +11,19 @@ from flask import make_response
 app = Flask(__name__)
 cors = CORS(app)
 
-API_KEY = os.getenv('PLANT_ID_API_KEY') 
-API_URL = "https://api.plant.id/v2/identify"
+API_KEY = os.getenv('PLANT_ID_API_KEY')
+API_URL = "https://plant.id/api/v3/identification"
 
 
 def get_db_connection():
     try:
         conn = psycopg2.connect(
-            dbname=os.getenv("POSTGRES_DB", "mydatabase"),
+            dbname=os.getenv("POSTGRES_DB", "SAE6"),
             user=os.getenv("POSTGRES_USER", "user"),
             password=os.getenv("POSTGRES_PASSWORD", "password"),
             host=os.getenv("POSTGRES_HOST", "db"),
             port=5432
         )
-        print("Connexion à la base de données réussie")
         return conn
     except psycopg2.Error as e:
         print(f"Erreur lors de la connexion à la base de données: {e}")
@@ -176,7 +175,45 @@ def get_historique():
         cur.close()
         conn.close()
         return jsonify({"error": f"Erreur lors de la récupération de l'historique : {e}"}), 500
+    
+@app.route("/identify_plant", methods=["POST"])
+def identify_plant():
+    try:
+        data = request.get_json()
 
+        # Vérification des champs requis
+        if not data or "image" not in data or "latitude" not in data or "longitude" not in data:
+            return jsonify({"error": "Les champs 'image', 'latitude' et 'longitude' sont requis"}), 400
+
+        image_base64 = data["image"]
+        latitude = data["latitude"]
+        longitude = data["longitude"]
+
+        # Envoyer à l'API Plant ID
+        response = requests.post(
+            API_URL,
+            json={
+                "images": [f"data:image/jpeg;base64,{image_base64}"],
+                "latitude": latitude,
+                "longitude": longitude,
+                "similar_images": True
+            },
+            headers={
+                "Content-Type": "application/json",
+                "Api-Key": API_KEY
+            },
+            params={"language": "fr"}
+        )
+
+        if response.status_code not in [200, 201]:
+            print(f"Erreur de l'API Plant ID : Code {response.status_code}, Réponse : {response.text}")
+            return jsonify({"error": "Échec de l'identification de la plante"}), response.status_code
+
+        result = response.json()
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Erreur lors de l'identification : {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
