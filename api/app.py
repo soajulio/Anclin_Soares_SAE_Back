@@ -214,6 +214,23 @@ def identify_plant():
 
     except Exception as e:
         return jsonify({"error": f"Erreur lors de l'identification : {str(e)}"}), 500
+    
+@app.route('/delete_historique/<int:id>', methods=['DELETE'])
+def delete_historique(id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute('DELETE FROM historique WHERE id = %s', (id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"message": "Entrée supprimée avec succès"}), 200
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        return jsonify({"error": f"Erreur lors de la suppression : {e}"}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
