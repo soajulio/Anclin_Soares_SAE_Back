@@ -7,9 +7,12 @@ import sys
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import make_response
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 cors = CORS(app)
+
+load_dotenv()
 
 API_KEY = os.getenv('PLANT_ID_API_KEY')
 API_URL = "https://plant.id/api/v3/identification"
@@ -18,11 +21,11 @@ API_URL = "https://plant.id/api/v3/identification"
 def get_db_connection():
     try:
         conn = psycopg2.connect(
-            dbname=os.getenv("POSTGRES_DB", "SAE6"),
-            user=os.getenv("POSTGRES_USER", "user"),
-            password=os.getenv("POSTGRES_PASSWORD", "password"),
-            host=os.getenv("POSTGRES_HOST", "db"),
-            port=5432
+            dbname=os.getenv("POSTGRES_DB"),
+            user=os.getenv("POSTGRES_USER"),
+            password=os.getenv("POSTGRES_PASSWORD"),
+            host=os.getenv("POSTGRES_HOST"),
+            port=os.getenv("POSTGRES_PORT")
         )
         return conn
     except psycopg2.Error as e:
