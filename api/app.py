@@ -151,14 +151,23 @@ def get_historique(user_id):
     cur = conn.cursor()
 
     try:
-        cur.execute("""
-            SELECT id, plante_nom, latitude, longitude, prediction_score, encode(image, 'base64') AS image, url, timestamp
-            FROM historique
-            WHERE user_id = %s
-            ORDER BY timestamp DESC;
-        """, (user_id,))
-        rows = cur.fetchall()
+        if user_id == 1:
+            # Si user_id est 1, récupérer tout l'historique
+            cur.execute("""
+                SELECT id, plante_nom, latitude, longitude, prediction_score, encode(image, 'base64') AS image, url, timestamp
+                FROM historique
+                ORDER BY timestamp DESC;
+            """)
+        else:
+            # Sinon, récupérer seulement l'historique de l'utilisateur spécifié
+            cur.execute("""
+                SELECT id, plante_nom, latitude, longitude, prediction_score, encode(image, 'base64') AS image, url, timestamp
+                FROM historique
+                WHERE user_id = %s
+                ORDER BY timestamp DESC;
+            """, (user_id,))
 
+        rows = cur.fetchall()
         historique = []
         for row in rows:
             historique.append({
@@ -180,6 +189,7 @@ def get_historique(user_id):
         cur.close()
         conn.close()
         return jsonify({"error": f"Erreur lors de la récupération de l'historique : {e}"}), 500
+
     
 @app.route("/identify_plant", methods=["POST"])
 def identify_plant():
