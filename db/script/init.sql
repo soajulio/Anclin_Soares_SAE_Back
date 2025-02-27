@@ -11,13 +11,17 @@ INSERT INTO users (username, password, email) VALUES ('admin', 'scrypt:32768:8:1
 
 DROP TABLE IF EXISTS historique;
 
+DROP TABLE IF EXISTS historique;
+
 CREATE TABLE historique (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
     plante_nom TEXT,
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
     prediction_score REAL,
     image BYTEA,
     url TEXT,
-    timestamp TIMESTAMP
+    timestamp TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

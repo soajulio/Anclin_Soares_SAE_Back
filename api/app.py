@@ -50,14 +50,14 @@ def check_credentials():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    cur.execute('SELECT password FROM users WHERE username = %s;', (username,))
+    cur.execute('SELECT id, password FROM users WHERE username = %s;', (username,))
     user = cur.fetchone()
 
     cur.close()
     conn.close()
 
-    if user and check_password_hash(user[0], password):
-        response = make_response(jsonify({'message': 'Connexion réussie'}), 200)
+    if user and check_password_hash(user[1], password):
+        response = make_response(jsonify({'message': 'Connexion réussie', 'user_id': user[0]}), 200)
         return response
     else:
         response = make_response(jsonify({'error': 'Nom d\'utilisateur ou mot de passe incorrect'}), 401)
@@ -106,13 +106,14 @@ def add_historique():
     data = request.get_json()
 
     # Vérification des champs requis
-    if not data or 'plante_nom' not in data or 'latitude' not in data or 'longitude' not in data or 'prediction_score' not in data or 'image' not in data:
-        return jsonify({"error": "Tous les champs sont requis : plante_nom, latitude, longitude, prediction_score, image"}), 400
+    if not data or 'plante_nom' not in data or 'latitude' not in data or 'longitude' not in data or 'prediction_score' not in data or 'image' not in data or 'user_id' not in data:
+        return jsonify({"error": "Tous les champs sont requis : plante_nom, latitude, longitude, prediction_score, image, user_id"}), 400
 
     plante_nom = data['plante_nom']
     latitude = data['latitude']
     longitude = data['longitude']
     prediction_score = data['prediction_score']
+    user_id = data['user_id']
     url = data.get('url', None)  # URL facultative
 
     # Conversion de l'image base64 en binaire
@@ -128,9 +129,9 @@ def add_historique():
 
     try:
         cur.execute("""
-            INSERT INTO historique (plante_nom, latitude, longitude, prediction_score, image, url, timestamp) 
-            VALUES (%s, %s, %s, %s, %s, %s, NOW());
-        """, (plante_nom, latitude, longitude, prediction_score, psycopg2.Binary(image_data), url))
+            INSERT INTO historique (user_id, plante_nom, latitude, longitude, prediction_score, image, url, timestamp)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW());
+        """, (user_id, plante_nom, latitude, longitude, prediction_score, psycopg2.Binary(image_data), url))
 
         conn.commit()
         cur.close()
@@ -144,17 +145,18 @@ def add_historique():
         return jsonify({"error": f"Erreur lors de l'ajout à l'historique : {e}"}), 500
 
 
-@app.route('/get_historique', methods=['GET'])
-def get_historique():
+@app.route('/get_historique/<int:user_id>', methods=['GET'])
+def get_historique(user_id):
     conn = get_db_connection()
     cur = conn.cursor()
 
     try:
         cur.execute("""
-            SELECT id, plante_nom, latitude, longitude, prediction_score, encode(image, 'base64') AS image, url, timestamp 
+            SELECT id, plante_nom, latitude, longitude, prediction_score, encode(image, 'base64') AS image, url, timestamp
             FROM historique
+            WHERE user_id = %s
             ORDER BY timestamp DESC;
-        """)
+        """, (user_id,))
         rows = cur.fetchall()
 
         historique = []
