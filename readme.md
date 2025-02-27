@@ -1,10 +1,9 @@
 # ANCLIN Ethan SOARES Julio SAE6
-
 ## Sujet Alternant - Partie Back-end
 
-### Configuration du Projet
+## Configuration du Projet
 
-#### Fichier `.env`
+### Fichier `.env`
 
 Créez un fichier `.env` à la racine du projet avec les variables d'environnement suivantes :
 
@@ -17,14 +16,14 @@ POSTGRES_HOST=db  # Nom du service défini dans le docker-compose.yml
 POSTGRES_PORT=5432  # Port défini dans le docker-compose.yml
 PLANT_ID_API_KEY=votre_api_key_plant_id
 ``` 
-#### Commandes d'installation pour lancer correctement le projet
+### Commandes d'installation pour lancer correctement le projet
 
 
 
 
 
 
-#### Instructions pour l'API
+### Instructions pour l'API
 
 Notre API est définie dans le fichier `app.py`. Pour lancer l'API, utilisez la commande suivante :
 
