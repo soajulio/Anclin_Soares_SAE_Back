@@ -17,6 +17,7 @@ POSTGRES_HOST=db  # Nom du service défini dans le docker-compose.yml
 POSTGRES_PORT=5432  # Port défini dans le docker-compose.yml
 PLANT_ID_API_KEY=votre_api_key_plant_id
 ``` 
+#### Commandes d'installation pour lancer correctement le projet
 
 
 
@@ -31,6 +32,6 @@ Notre API est définie dans le fichier `app.py`. Pour lancer l'API, utilisez la 
 docker compose up -d
 ```
 
-**Note :** L'API est accessible sur le port **5000**. Ce port est fixe car il est codé en dur dans la partie Front pour les requêtes vers notre API.
+*Note :* L'API est accessible sur le port **5000**. Ce port est fixe car il est codé en dur dans la partie Front pour les requêtes vers notre API.
 
 
