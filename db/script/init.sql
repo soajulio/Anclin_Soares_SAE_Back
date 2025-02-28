@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (username, password, email) VALUES ('admin', 'scrypt:32768:8:1$6xL58chXNfRQZm7B$3ae7d35760aa403b98d6d17a9182e8c0bcce8dc841ebba023eb1d1ff8084e758b77e9c101f366ba95cbd95feeb05587d047630c339143ecb519e7bff52f59da6', 'admin@example.com'); 
+INSERT INTO users (username, password, email) VALUES ('Utilisateur Inconnu', 'scrypt:32768:8:1$gAgeRy9nR8yIQr9F$419d497b975f9ccc009b0de326305e6e56e94413f2ca5c0163ca78cc4a71efc96c0ce766215764d0d4d1f70db548444d8f13892841edf0b23266f0d277b09557', '-'); 
 
 DROP TABLE IF EXISTS historique;
 

@@ -113,7 +113,7 @@ def add_historique():
     latitude = data['latitude']
     longitude = data['longitude']
     prediction_score = data['prediction_score']
-    user_id = data.get('user_id', 0)
+    user_id = data['user_id']
     url = data.get('url', None)  # URL facultative
 
     # Conversion de l'image base64 en binaire
